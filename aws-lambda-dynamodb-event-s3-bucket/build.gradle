@@ -1,0 +1,41 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.8.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id 'java'
+}
+
+group = 'com.aws.lambda.sample'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	def amazon_extra = {
+		exclude group: 'software.amazon.ion', module: 'ion-java'
+		exclude group: 'com.amazonaws', module: 'jmespath-java'
+	}
+	compile 'org.springframework.boot:spring-boot-starter'
+	compile group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb',version: '1.11.504'
+	compile 'com.amazonaws:aws-lambda-java-core:1.2.0'
+	compile 'org.json:json:20171018'
+	compile 'com.amazonaws:aws-lambda-java-events:2.2.6'
+
+	compile 'org.slf4j:slf4j-api'
+    //compile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
+	testCompile 'org.springframework.boot:spring-boot-starter-test'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-ssm', version: '1.11.566', amazon_extra
+}
+
+task buildZip(type: Zip) {
+	from compileJava
+	//from file("/src/main/resource/application.properties")
+	from processResources
+	into('lib') {
+		from configurations.runtimeClasspath
+	}
+}
+
+build.dependsOn buildZip
